@@ -1,22 +1,11 @@
 class Song
-   
-@@all = []
+   attr_accessor :name, :artist, :genre
+   @@all = []
 
-attr_accessor :name
-
-def initialize(name)
+def initialize(name, artist = nil, genre = nil)
 @name = name
-@artist = artist
-@genre = genre
-save
-end
-
-def save
-@@all << self
-end
-
-def self.all
-@@all
+self.artist = artist if artist
+self.genre = genre if genre
 end
 
 def self.destroy_all
@@ -27,25 +16,41 @@ def self.create
 self.new.save
 end
 
-def self.new_by_filename(file)
-    song_parts = file.split(" - ")
-    artist = song_parts[0]
-    song_name = song_parts[1]
-    new_song = Song.new(song_name)
-    new_song.artist_name = artist
-    new_song
-  end
-  
-  def self.create_from_filename(file)
-    @@all << self.new_by_filename.save(file)
-end
-  
- 
+def self.all
+@@all
 end
 
-# def self.find_by_name(name)
- # @@all.detect { |s| s.name == name }
-# end
+def self.find_by_name(name)
+  self.all.detect{|s| s.name == name}
+end
+
+def self.find_or_create_by_name(name)
+  self.find_by_name(name) || self.create(name)
+end
+
+def self.new_by_filename(file)
+    song_parts = file.split(" - ")
+    artist_name = song_parts[0]
+    song_name = song_parts[1]
+    genre_name = song_parts[2]
+    
+    
+    artist = Artist.find_or_create_by_name(artist_name)
+     genre = Genre.find_or_create_by_name(genre_name)
+     self.new(song_name, artist, genre)
+  end
+  
+  def self.create_from_filename(filename)
+     new_from_filename(filename).tap{ |s| s.save }
+   end
+
+  def save
+  @@all << self
+   end
+
+end
+
+
   
 
 #    def self.find_or_create_by_name(name)

@@ -2,19 +2,13 @@ require_relative './concerns/findable'
 
 class Genre
   extend Concerns::Findable
-  
-@@all = []
+  @@all = []
 
-attr_accessor :name
+attr_accessor :name, :songs
 
 def initialize(name)
 @name = name
 @songs = []
-save
-end
-
-def save
-@@all << self
 end
 
 def self.all
@@ -29,9 +23,12 @@ def self.create
 self.new.save
 end
 
-def artists(song)
-  genre.song = Artist.new(song)
+def artists
+  self.songs.collect{|s| s.artist}.uniq
 end
 
+def save
+   @@all << self
+end
 
 end
